@@ -98,14 +98,22 @@ private fun TicTacToeCell(
     val isEnabled = remember { mutableStateOf(true)}
 
     Button(
-        onClick = {},
+        onClick = {
+            isEnabled.value = false
+            grid[rowNum][colNum].value = player.value
+            if (player.value == "X"){
+                player.value = "O"
+            }else{
+                player.value = "X"
+            }
+        },
         colors = buttonColors,
         shape = RectangleShape,
         border = BorderStroke(1.dp, Color.Blue),
         modifier = modifier,
         enabled = isEnabled.value
     ) {
-        Text(text = "", textAlign = TextAlign.Center)
+        Text(text = grid[rowNum][colNum].value, textAlign = TextAlign.Center)
     }
 }
 

@@ -18,6 +18,9 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -43,26 +46,43 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TicTacToe() {
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .wrapContentSize(Alignment.Center)) {
-        TicTacToeRow()
-        TicTacToeRow()
-        TicTacToeRow()
+    val grid = Array(3) { Array(3) { remember { mutableStateOf("") } } }
+    val player = remember { mutableStateOf("X") }
+    val winner = remember { mutableStateOf("") }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .wrapContentSize(Alignment.Center)
+    ) {
+        for (rowNum in 0..2) {
+            TicTacToeRow(rowNum, grid, player, winner)
+        }
     }
 }
 
 @Composable
-private fun TicTacToeRow() {
+private fun TicTacToeRow(
+    rowNum: Int,
+    grid: Array<Array<MutableState<String>>>,
+    player: MutableState<String>,
+    winner: MutableState<String>
+) {
     Row {
-        TicTacToeCell()
-        TicTacToeCell()
-        TicTacToeCell()
+        for (colNum in 0..2) {
+            TicTacToeCell(rowNum, colNum, grid, player, winner)
+        }
     }
 }
 
 @Composable
-private fun TicTacToeCell() {
+private fun TicTacToeCell(
+    rowNum: Int,
+    colNum: Int,
+    grid: Array<Array<MutableState<String>>>,
+    player: MutableState<String>,
+    winner: MutableState<String>
+) {
     val buttonColors = ButtonColors(
         containerColor = Color.Black,
         contentColor = Color.Green,
@@ -75,14 +95,17 @@ private fun TicTacToeCell() {
         .height(50.dp)
         .width(50.dp)
 
+    val isEnabled = remember { mutableStateOf(true)}
+
     Button(
         onClick = {},
         colors = buttonColors,
         shape = RectangleShape,
         border = BorderStroke(1.dp, Color.Blue),
-        modifier = modifier
+        modifier = modifier,
+        enabled = isEnabled.value
     ) {
-        Text(text = "X", textAlign = TextAlign.Center)
+        Text(text = "", textAlign = TextAlign.Center)
     }
 }
 

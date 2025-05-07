@@ -121,6 +121,8 @@ private fun TicTacToeCell(
 @Composable
 fun TicTacToePreview() {
     TicTacToeTheme {
-        TicTacToe()
+        Surface(modifier = Modifier.fillMaxSize()) {
+            TicTacToe()
+        }
     }
 }

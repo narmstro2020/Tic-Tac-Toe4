@@ -58,6 +58,10 @@ fun TicTacToe() {
         for (rowNum in 0..2) {
             TicTacToeRow(rowNum, grid, player, winner)
         }
+        // new code for May 8th.
+        // We will add logic that either makes this text box print out X WINS or O WINS
+        // TODO: Align the text so that its centered and changed the color
+        Text(text = "X WINS!")
     }
 }
 
@@ -95,15 +99,15 @@ private fun TicTacToeCell(
         .height(50.dp)
         .width(50.dp)
 
-    val isEnabled = remember { mutableStateOf(true)}
+    val isEnabled = remember { mutableStateOf(true) }
 
     Button(
         onClick = {
             isEnabled.value = false
             grid[rowNum][colNum].value = player.value
-            if (player.value == "X"){
+            if (player.value == "X") {
                 player.value = "O"
-            }else{
+            } else {
                 player.value = "X"
             }
         },

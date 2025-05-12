@@ -46,42 +46,78 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun TicTacToe() {
-    val grid = Array(3) { Array(3) { remember { mutableStateOf("") } } }
+    val grid = remember { Array(3) { Array(3) { mutableStateOf("") } } }
     val player = remember { mutableStateOf("X") }
     val winner = remember { mutableStateOf("") }
+
+    fun checkForWinner() {
+        val lines = listOf(
+            // Rows
+            listOf(grid[0][0], grid[0][1], grid[0][2]),
+            listOf(grid[1][0], grid[1][1], grid[1][2]),
+            listOf(grid[2][0], grid[2][1], grid[2][2]),
+            // Columns
+            listOf(grid[0][0], grid[1][0], grid[2][0]),
+            listOf(grid[0][1], grid[1][1], grid[2][1]),
+            listOf(grid[0][2], grid[1][2], grid[2][2]),
+            // Diagonals
+            listOf(grid[0][0], grid[1][1], grid[2][2]),
+            listOf(grid[0][2], grid[1][1], grid[2][0])
+        )
+
+        for (line in lines) {
+            val values = line.map { it.value }
+            if (values.all { it == "X" }) {
+                winner.value = "X"
+                return
+            } else if (values.all { it == "O" }) {
+                winner.value = "O"
+                return
+            }
+        }
+    }
 
     Column(
         modifier = Modifier
             .fillMaxSize()
             .wrapContentSize(Alignment.Center)
     ) {
-        for (rowNum in 0..2) {
-            TicTacToeRow(rowNum, grid, player, winner)
+        for (rowNumber in 0..2) {
+            TicTacToeRow(rowNumber, grid, player, winner, ::checkForWinner)
+        }
+        if(winner.value.isNotEmpty()){
+            Text(
+                text = "Winner: ${winner.value}",
+                modifier = Modifier.padding(top = 16.dp),
+                color = Color.Red
+            )
         }
     }
 }
 
 @Composable
 private fun TicTacToeRow(
-    rowNum: Int,
+    rowNumber: Int,
     grid: Array<Array<MutableState<String>>>,
     player: MutableState<String>,
-    winner: MutableState<String>
+    winner: MutableState<String>,
+    checkForWinner: () -> Unit
 ) {
     Row {
-        for (colNum in 0..2) {
-            TicTacToeCell(rowNum, colNum, grid, player, winner)
+        for (columnNumber in 0..2) {
+            TicTacToeCell(rowNumber, columnNumber, grid, player, winner, checkForWinner)
         }
     }
 }
 
 @Composable
 private fun TicTacToeCell(
-    rowNum: Int,
-    colNum: Int,
+    rowNumber: Int,
+    colNumber: Int,
     grid: Array<Array<MutableState<String>>>,
     player: MutableState<String>,
-    winner: MutableState<String>
+    winner: MutableState<String>,
+    checkForWinner: () -> Unit
 ) {
     val buttonColors = ButtonColors(
         containerColor = Color.Black,
@@ -95,16 +131,17 @@ private fun TicTacToeCell(
         .height(50.dp)
         .width(50.dp)
 
-    val isEnabled = remember { mutableStateOf(true)}
+    val isEnabled = remember { mutableStateOf(true) }
 
     Button(
         onClick = {
-            isEnabled.value = false
-            grid[rowNum][colNum].value = player.value
-            if (player.value == "X"){
-                player.value = "O"
-            }else{
-                player.value = "X"
+            if (isEnabled.value && winner.value.isEmpty()) {
+                grid[rowNumber][colNumber].value = player.value
+                checkForWinner()
+                if (winner.value.isEmpty()) {
+                    player.value = if (player.value == "X") "O" else "X"
+                }
+                isEnabled.value = false
             }
         },
         colors = buttonColors,
@@ -113,16 +150,15 @@ private fun TicTacToeCell(
         modifier = modifier,
         enabled = isEnabled.value
     ) {
-        Text(text = grid[rowNum][colNum].value, textAlign = TextAlign.Center)
+        Text(text = grid[rowNumber][colNumber].value, textAlign = TextAlign.Center)
     }
 }
+
 
 @Preview(showBackground = true)
 @Composable
 fun TicTacToePreview() {
     TicTacToeTheme {
-        Surface(modifier = Modifier.fillMaxSize()) {
-            TicTacToe()
-        }
+        TicTacToe()
     }
 }
